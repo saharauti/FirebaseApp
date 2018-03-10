@@ -88,7 +88,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
             if (markerPoints.size() > 1) {
-                //markerPoints.clear();
+                markerPoints.clear();
                 mMap.clear();
                // onMapReady(mMap);
             }
