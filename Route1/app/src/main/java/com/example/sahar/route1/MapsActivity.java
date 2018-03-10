@@ -87,11 +87,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(latLng).title("" + location)).showInfoWindow();
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
-            if (markerPoints.size() > 1) {
-                markerPoints.clear();
-                mMap.clear();
-               // onMapReady(mMap);
-            }
+            // for a single path uncomment the following
+//            if (markerPoints.size() > 1) {
+//                markerPoints.clear();
+//                mMap.clear();
+//               // onMapReady(mMap);
+//            }
 
             // Adding new item to the ArrayList
             markerPoints.add(latLng);
@@ -102,10 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Setting the position of the marker
             options.position(latLng);
 
-//            if (markerPoints.size() == 1) {
-//                options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//            }
-//            else if (markerPoints.size() == 2) {
+
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
           //  }
             mMap.addMarker(options);
