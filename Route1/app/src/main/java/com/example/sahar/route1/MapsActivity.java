@@ -87,10 +87,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(latLng).title("" + location)).showInfoWindow();
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
-            if (markerPoints.size() ==2) {
+            if (markerPoints.size() > 1) {
                 markerPoints.clear();
                 mMap.clear();
-                onMapReady(mMap);
+               // onMapReady(mMap);
             }
 
             // Adding new item to the ArrayList
@@ -110,7 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
           //  }
             mMap.addMarker(options);
 
-            if (markerPoints.size() == 2) {
+            if (markerPoints.size() >= 1) {
                 LatLng origin = locateCurrentPosition() ;//(LatLng) markerPoints.get(0);
                 LatLng dest = latLng;
 
@@ -334,11 +334,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             Log.e("RESULT :",""+result);
             if (result != null && result.size() != 0) {
-                for (int i = 0; i < result.size(); i++) {
+               for (int i = 0; i < result.size(); i++) {
                     points = new ArrayList();
                     lineOptions = new PolylineOptions();
 
-                    List<HashMap<String, String>> path = result.get(i);
+                    List<HashMap<String, String>> path = result.get(0);
 
                     for (int j = 0; j < path.size(); j++) {
                         HashMap<String, String> point = path.get(j);
@@ -355,12 +355,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     lineOptions.width(4);
                     lineOptions.color(Color.RED);
                     lineOptions.geodesic(true);
-
-                }
+               }
 
 // Drawing polyline in the Google Map for the i-th route
                 mMap.addPolyline(lineOptions);
-            }else {
+            }
+            else {
                 Toast.makeText(getApplicationContext(),"No route found !",Toast.LENGTH_LONG).show();
             }
         }
