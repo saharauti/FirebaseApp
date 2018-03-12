@@ -11,6 +11,8 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -56,10 +58,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        if (null != activeNetwork) {
+            // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+            SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+        }
+        else{
+            Toast.makeText(getApplicationContext(),"Check internet",Toast.LENGTH_LONG).show();
+        }
     }
 
     public void onMapSearch(View view) {
@@ -70,58 +80,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         List<Address> addressList = null;
 
         // Adding new item to the ArrayList
-
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
         if (location != null && !location.equals("")) {
 
             Geocoder geocoder = new Geocoder(this);
             try {
-                addressList = geocoder.getFromLocationName(location, 1);
+                if (null != activeNetwork) {
+                    addressList = geocoder.getFromLocationName(location, 1);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Check internet", Toast.LENGTH_LONG).show();
+
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            if (null != activeNetwork) {
+                Address address = addressList.get(0);
+                if (address == null) {
+                    Toast.makeText(getApplicationContext(), "Check Internet", Toast.LENGTH_LONG).show();
+                }
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                mMap.addMarker(new MarkerOptions().position(latLng).title("" + location)).showInfoWindow();
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
 
-            Address address = addressList.get(0);
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(latLng).title("" + location)).showInfoWindow();
-            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-            // for a single path uncomment the following
+                // for a single path uncomment the following
 //            if (markerPoints.size() > 1) {
 //                markerPoints.clear();
 //                mMap.clear();
 //               // onMapReady(mMap);
 //            }
 
-            // Adding new item to the ArrayList
-            markerPoints.add(latLng);
+                // Adding new item to the ArrayList
+                markerPoints.add(latLng);
 
-            // Creating MarkerOptions
-            MarkerOptions options = new MarkerOptions();
+                // Creating MarkerOptions
+                MarkerOptions options = new MarkerOptions();
 
-            // Setting the position of the marker
-            options.position(latLng);
+                // Setting the position of the marker
+                options.position(latLng);
 
 
                 options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-          //  }
-            mMap.addMarker(options);
+                //  }
+                mMap.addMarker(options);
 
-            if (markerPoints.size() >= 1) {
-                LatLng origin = locateCurrentPosition() ;//(LatLng) markerPoints.get(0);
-                LatLng dest = latLng;
+                if (markerPoints.size() >= 1) {
+                    LatLng origin = locateCurrentPosition();//(LatLng) markerPoints.get(0);
+                    LatLng dest = latLng;
 
-                // Getting URL to the Google Directions API
-                String url = getDirectionsUrl(origin, dest);
+                    // Getting URL to the Google Directions API
+                    String url = getDirectionsUrl(origin, dest);
 
-                DownloadTask downloadTask = new DownloadTask();
+                    DownloadTask downloadTask = new DownloadTask();
 
-                // Start downloading json data from Google Directions API
-                downloadTask.execute(url);
+                    // Start downloading json data from Google Directions API
+                    downloadTask.execute(url);
+                }
+            } else {
+                Toast.makeText(getApplicationContext(), "Enter location", Toast.LENGTH_LONG).show();
             }
-        }else {
-            Toast.makeText(getApplicationContext(),"Enter location",Toast.LENGTH_LONG).show();
+        }
+        else {
+            Toast.makeText(getApplicationContext(), "Check Internet", Toast.LENGTH_LONG).show();
+
         }
     }
 
